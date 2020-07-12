@@ -96,6 +96,7 @@ public class GetConnection {
 		Connection conn = new GetConnection().getConnection("staging?serverTimezone=UTC");
 		if (conn != null) {
 			System.out.println("Thanh cong");
+	System.out.println("123456testáaf");
 		}
 	}
 }
