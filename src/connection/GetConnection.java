@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class GetConnection {
-
+      //test_________######______________git
 	String driver = null;
 	String url = null;
 	String user = null;
@@ -96,6 +96,7 @@ public class GetConnection {
 		Connection conn = new GetConnection().getConnection("staging?serverTimezone=UTC");
 		if (conn != null) {
 			System.out.println("Thanh cong");
+
 		}
 	}
 }
