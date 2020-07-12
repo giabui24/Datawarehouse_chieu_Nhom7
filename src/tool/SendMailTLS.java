@@ -40,6 +40,6 @@ public class SendMailTLS {
 	}
 	public static void main(String[] args) {
         SendMailTLS ss = new SendMailTLS();
-        System.out.println(ss.sendMail("17130046@st.hcmuaf.edu.vn", "test send mail", "thu mail "));
+        System.out.println(ss.sendMail("17130046@st.hcmuaf.edu.vn", "test send mail", "thu ma "));
     }
 }
