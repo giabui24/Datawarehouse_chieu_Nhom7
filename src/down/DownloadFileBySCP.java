@@ -30,7 +30,6 @@ import config.Config;
 import connection.ConnectMysql;
 import log.Log;
 
-
 public class DownloadFileBySCP {
 	public static DownloadFileBySCP scpObject = new DownloadFileBySCP();
 	public Config config = new Config(null, null, null, null, null, null);
@@ -38,7 +37,6 @@ public class DownloadFileBySCP {
 	String text = "";
 	public String folderToDown = "Z:\\data_WH\\";
 	public String tempfolder = "Z:\\viet\\";
-
 
 	static {
 		try {
@@ -115,12 +113,12 @@ public class DownloadFileBySCP {
 		String localPath = scpObject.tempfolder;
 
 		CkSsh ssh = new CkSsh();
-	
+
 		// unclock .....
 		CkGlobal ck = new CkGlobal();
 		GLOBAL glo = new GLOBAL();
 		ck.UnlockBundle("Start my 30-day Trial");
-		
+
 		ck.get_UnlockStatus();
 
 		// Connect to an SSH server:
@@ -149,7 +147,7 @@ public class DownloadFileBySCP {
 		// download directory chieu
 		scp.put_SyncMustMatch("sinhvien_chieu*.*");
 		success = scp.SyncTreeDownload(remotepath, localPath, 2, false);
-       // downloand diretory sang
+		// downloand diretory sang
 //		scp.put_SyncMustMatch("sinhvien_sang*.*");
 //		success = scp.SyncTreeDownload(remotepath, localPath, 2, false);
 		if (!success) {
@@ -157,11 +155,12 @@ public class DownloadFileBySCP {
 			return;
 		}
 
-	//	log.writeHistory(hostname, username, pass, fileName, status);
+		// log.writeHistory(hostname, username, pass, fileName, status);
 		System.out.println("SCP download file success.");
 		ssh.Disconnect();
 
 	}
+
 // gửi gmail
 	public void sendMail(String text) throws AddressException, MessagingException {
 		Properties p = new Properties();
@@ -192,32 +191,32 @@ public class DownloadFileBySCP {
 
 		try {
 			Connection connectControlDB = ConnectMysql.getConnection();
-			String sql = "INSERT INTO data_file_logs (id, your_filename, status_file,encode,delimiter,number_column,download_to_dir_local,time_staging,staging_load_count,table_staging_load) VALUES (?,?,?,?,?,?,?,?,?,?)";
+			String sql = "INSERT INTO data_file_logs ( your_filename, status_file,encode,delimiter,number_column,download_to_dir_local,time_staging,staging_load_count,table_staging_load) VALUES (?,?,?,?,?,?,?,?,?)";
 			PreparedStatement statement = connectControlDB.prepareStatement(sql);
 
-			statement.setString(1, config.getIdconfig().concat(file.getName()));
-			statement.setString(2, file.getName());
-			statement.setString(3,"OK download");
-			statement.setString(4, "UTF-8");
-			statement.setString(5, ""); // delimiter
-			statement.setString(6, "");// column
-			statement.setString(7, folderToDown);
-			statement.setString(8, "");//time staging
-			statement.setString(9, "");// staging count
-			statement.setString(10, "");//table staging
-			//System.out.println(Long.toString(file.length()));
-			
+
+			statement.setString(1, file.getName());
+			statement.setString(2, "OK download");
+			statement.setString(3, "UTF-8");
+			statement.setString(4, ""); // delimiter
+			statement.setString(5, "");// column
+			statement.setString(6, folderToDown);
+			statement.setString(7, "");// time staging
+			statement.setString(8, "");// staging count
+			statement.setString(9, "");// table staging
+			// System.out.println(Long.toString(file.length()));
+
 			statement.executeUpdate();
 			connectControlDB.close();
 			System.out.println("write log: " + file.getName());
-		
+
 			System.out.println("**********");
 		} catch (Exception e) {
-			System.out.println("fail");
+			System.out.println("fail write Log");
 			scpObject.sendMail("Write Log Fail");
 			System.out.println(e);
 		}
-
+		
 	}
 
 	public void transTemporaryFolder(String pathOfStagingFolder) throws AddressException, MessagingException {
@@ -225,8 +224,8 @@ public class DownloadFileBySCP {
 		File[] childFile = usedFolder.listFiles();
 		int count = 0;
 		for (File file : childFile) {
-			if (file.renameTo(new File(folderToDown  + file.getName()))) {
-				scpObject.writeLog(file);
+			if (file.renameTo(new File(folderToDown + file.getName()))) {
+				// scpObject.writeLog(file);
 				System.out.println(file.getName() + " is moved successful!");
 				text += file.getName() + " ==> put log complete " + "\n";
 				count++;
@@ -240,11 +239,66 @@ public class DownloadFileBySCP {
 
 	}
 
+	// đổi tên các file có đôi khác csv và txt
+	public void rename() throws AddressException, MessagingException {
+		File dir = new File(folderToDown);
+
+		File[] children = dir.listFiles();
+//
+		for (File files : children) {
+			if (!findEx(files.getAbsolutePath()).equals("csv") && !findEx(files.getAbsolutePath()).equals("txt")) {
+				if (files.renameTo(new File(renameFileCSV(files.getAbsolutePath())))) {
+					System.out.println(files.getAbsolutePath() + " rename succssful");
+				} else {
+					System.out.println(files.getAbsolutePath() + " Rename failed");
+				}
+				// scpObject.writeLog(files);
+			}
+		}
+	}
+
+	// đổi tên thành .csv
+	public static String renameFileCSV(String fileName) {
+		String[] arrImg = fileName.split("\\.");
+		String duoiFileImg = arrImg[arrImg.length - 1];
+		String nameFile = "";
+		for (int i = 0; i < (arrImg.length - 1); i++) {
+			if (i == 0) {
+				nameFile = arrImg[i];
+			} else {
+				nameFile += "-" + arrImg[i];
+			}
+		}
+		nameFile = nameFile + "." + "csv";
+		return nameFile;
+	}
+
+	// cập nhật vào log
+	public void writeLogFollder() throws AddressException, MessagingException {
+		File dir = new File(folderToDown);
+
+		File[] children = dir.listFiles();
+//
+		for (File files : children) {
+			scpObject.writeLog(files);
+		}
+	}
+
+// lấy đuôi file
+	public String findEx(String path) {
+		String ex = "";
+		int numex = -99;
+		numex = path.indexOf(".");
+		ex = path.substring(numex + 1);
+		return ex;
+	}
+
 	public void mainSCP(String idconfig) throws AddressException, MessagingException {
 		scpObject.connectToConfig(idconfig);
 		scpObject.download();
 		scpObject.transTemporaryFolder(folderToDown);
-
+		scpObject.rename();
+		scpObject.writeLogFollder();
 	}
 
 	public static void main(String[] args) throws AddressException, MessagingException {
