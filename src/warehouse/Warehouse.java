@@ -6,9 +6,12 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.joda.time.DateTime;
+
 public class Warehouse {
 	public void importSV() throws SQLException, ClassNotFoundException {
 		ConnectDatabase conDB = new ConnectDatabase();
+		int sk = 0;
 		String ms;
 		String sql = "";
 		String IDFile = null;
@@ -25,11 +28,18 @@ public class Warehouse {
 			String desDB = config.getString(9);
 			int numberCol = 12;
 			while (staging.next()) {
+				//import dateDim
+				Date_Dim dateDim=new Date_Dim();
+				int y = Integer.valueOf(staging.getString(5).substring(0, 4));
+				int m = Integer.valueOf(staging.getString(5).substring(5, 7));
+				int d = Integer.valueOf(staging.getString(5).substring(8, 10));
+				dateDim.importDateDim(new DateTime(y,m,d,0,0,0));
+				
 				String maSV = staging.getString(2);
 				// Kiểm tra xem trong warehouse có chứa sinh viên nào có mã
 				// trùng với mã maSV sắp insert vào hay không
 				sql = "Select * from " + desDB + " where " + desDB + ".maSV = " + maSV + " and " + desDB
-						+ ".dt_expired = '9999-12-31 00:00:00'";
+						+ ".dt_Expired = '9999-12-31 00:00:00.000'";
 				ResultSet warehouseRec = warehouse.executeQuery(sql);
 				if (warehouseRec.next()) {
 					// Trùng maSV nhưng khác một số field
@@ -40,26 +50,30 @@ public class Warehouse {
 					if (check) {
 						// Set DT_expired của dữ liệu cũ thành thời gian hiện tại
 						sql = "Update " + desDB + " set dt_expired=now() where maSV =" + maSV
-								+ " and dt_expired = '9999-12-31 00:00:00'";
+								+ " and dt_expired = '9999-12-31 00:00:00.000'";
 						warehouse.executeLargeUpdate(sql);
-						// insert dữ liệu mới vào warehouse
+					// insert dữ liệu mới vào warehouse
+						//get skDateDim
+						sk =dateDim.getSKDateDim(staging.getString(5));
 						sql = "Insert into " + desDB
-								+ " (STT, maSV, ho, ten, ngaySinh, maLop, tenLop, dt, queQuan, email, idFile, dt_Expired) values("
+								+ " (STT, maSV, ho, ten, ngaySinh, maLop, tenLop, dt, queQuan, email, idFile, dt_Expired, skDateDim) values("
 								+ staging.getString(1) + ",'" + staging.getString(2) + "','" + staging.getString(3)
 								+ "','" + staging.getString(4) + "','" + staging.getString(5) + "','"
 								+ staging.getString(6) + "','" + staging.getString(7) + "','" + staging.getString(8)
 								+ "','" + staging.getString(9) + "','" + staging.getString(10) + "','"
-								+ staging.getString(11) + "','9999-12-31 00:00:00')";
+								+ staging.getString(11) + "','9999-12-31 00:00:00.000',"+String.valueOf(sk)+")";
 						warehouse.executeLargeUpdate(sql);
 					}
 				} else {
-					// insert dữ liệu mới vào warehouse
+				// insert dữ liệu mới vào warehouse
+					//get skDateDim
+					sk =dateDim.getSKDateDim(String.valueOf(y)+"-"+String.valueOf(m)+"-"+String.valueOf(d));
 					sql = "Insert into " + desDB
-							+ " (STT, maSV, ho, ten, ngaySinh, maLop, tenLop, dt, queQuan, email, idFile, dt_Expired) values("
+							+ " (STT, maSV, ho, ten, ngaySinh, maLop, tenLop, dt, queQuan, email, idFile, dt_Expired, skDateDim) values("
 							+ staging.getString(1) + ",'" + staging.getString(2) + "','" + staging.getString(3) + "','"
 							+ staging.getString(4) + "','" + staging.getString(5) + "','" + staging.getString(6) + "','"
 							+ staging.getString(7) + "','" + staging.getString(8) + "','" + staging.getString(9) + "','"
-							+ staging.getString(10) + "','" + staging.getString(11) + "','9999-12-31 00:00:00.000')";
+							+ staging.getString(10) + "','" + staging.getString(11) + "','9999-12-31 00:00:00.000',"+String.valueOf(sk)+")";
 					warehouse.executeLargeUpdate(sql);
 				}
 				IDFile = staging.getString(11);
@@ -81,11 +95,10 @@ public class Warehouse {
 		sta.executeLargeUpdate(sql);
 
 		// Gửi mail thông báo
-		SendMail sm = new SendMail();
-		sm.send(ms);
+		SendMail.send(ms);
 	}
 
-	/*public void importMH() throws SQLException, ClassNotFoundException {
+	public void importMH() throws SQLException, ClassNotFoundException {
 		ConnectDatabase conDB = new ConnectDatabase();
 		String ms;
 		String sql = "";
@@ -157,11 +170,11 @@ public class Warehouse {
 		sta.executeLargeUpdate(sql);
 
 		// Gửi mail thông báo
-		SendMail sm = new SendMail();
-		// sm.send(ms);
-	}*/
+		SendMail.send(ms);
+	}
 
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
 		Warehouse ware = new Warehouse();
+		ware.importSV();
 	}
 }

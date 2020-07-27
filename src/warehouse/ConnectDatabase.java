@@ -15,7 +15,7 @@ public class ConnectDatabase {
 			String user = "root";
 			String password = "0411";
 			connection = DriverManager.getConnection(url, user, password);
-			sql = "Select * from Config where id=2";
+			sql = "Select * from Config where id=1";
 			result = connection.createStatement().executeQuery(sql);
 		} catch (ClassNotFoundException | SQLException e) {
 			System.out.println("Kết nối thất bại");
@@ -23,6 +23,19 @@ public class ConnectDatabase {
 		return result;
 	}
 
+	public Connection connectDateDim() throws SQLException, ClassNotFoundException {
+		Connection connection = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:3306/datawarehouse?useUnicode=true&amp;characterEncoding=utf8?autoReconnect=true&useSSL=false";
+			String user = "root";
+			String password = "0411";
+			connection = DriverManager.getConnection(url, user, password);
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Kết nối thất bại");
+		}
+		return connection;
+	}
 	public ResultSet loadSDB() throws SQLException, ClassNotFoundException {
 		String sql = "";
 		Connection connection;
