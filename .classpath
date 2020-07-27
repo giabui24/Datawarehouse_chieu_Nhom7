@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="src/lib/mail-1.5.0-b01.jar"/>
 	<classpathentry kind="lib" path="src/lib/mysql-connector-java-5.1.47.jar"/>
 	<classpathentry kind="lib" path="src/lib/sqljdbc42.jar"/>
+	<classpathentry kind="lib" path="src/chilkat.dll"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
