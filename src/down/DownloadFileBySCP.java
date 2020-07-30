@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -28,11 +29,14 @@ import com.chilkatsoft.CkSsh;
 
 import config.Config;
 import connection.ConnectMysql;
+import connection.GetConnection;
+import etl.Staging;
 import log.Log;
 
 public class DownloadFileBySCP {
+	public static Staging stagig = new Staging();
 	public static DownloadFileBySCP scpObject = new DownloadFileBySCP();
-	public Config config = new Config(null, null, null, null, null, null);
+	public Config config = new Config(null, null, null, null, null, null, null,null);
 	public Log log = new Log(null, null, null, null, null, null, null, null, null, null);
 	String text = "";
 	public String folderToDown = "Z:\\data_WH\\";
@@ -40,7 +44,8 @@ public class DownloadFileBySCP {
 
 	static {
 		try {
-			System.loadLibrary("chilkat");
+//			System.loadLibrary("chilkat");
+			System.load("T:\\A_TheDuck_viet\\warehouse\\chilkat-9.5.0-jdk8-x64\\chilkat.dll");
 		} catch (UnsatisfiedLinkError e) {
 			System.err.println("Native code library failed to load.\n" + e);
 			System.exit(1);
@@ -51,7 +56,7 @@ public class DownloadFileBySCP {
 		try {
 			Connection connectDB = ConnectMysql.getConnection();
 
-			String sql = "Select idconfig, hostname, port, user,password,remotepath from config where idconfig ='"
+			String sql = "Select idconfig, hostname, port, user,password,remotepath, namesub , stagingload from config where idconfig ='"
 					+ idConfig + "'";
 
 			Statement statement;
@@ -66,6 +71,8 @@ public class DownloadFileBySCP {
 				config.setUser(rs.getString(4));
 				config.setPassword(rs.getString(5));
 				config.setRemotepath(rs.getString(6));
+				config.setNamesub(rs.getString(7));
+				config.setStagingload(rs.getString(8));
 
 			}
 			// Đóng kết nối
@@ -107,7 +114,7 @@ public class DownloadFileBySCP {
 		String username = scpObject.config.getUser();
 		String pass = scpObject.config.getPassword();
 		String remotepath = scpObject.config.getRemotepath();
-
+		String namesub = scpObject.config.getNamesub();
 		// tạo thư mục để lưu tạm
 		scpObject.createTempFolderToDownload();
 		String localPath = scpObject.tempfolder;
@@ -145,7 +152,7 @@ public class DownloadFileBySCP {
 		}
 
 		// download directory chieu
-		scp.put_SyncMustMatch("sinhvien_chieu*.*");
+		scp.put_SyncMustMatch(namesub);
 		success = scp.SyncTreeDownload(remotepath, localPath, 2, false);
 		// downloand diretory sang
 //		scp.put_SyncMustMatch("sinhvien_sang*.*");
@@ -171,7 +178,7 @@ public class DownloadFileBySCP {
 		// get Session
 		Session s = Session.getInstance(p, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("vietnguyen.zuyn01@gmail.com", "quocviet270699");
+				return new PasswordAuthentication("vietnguyen.zuyn01@gmail.com", "netingepytkngqut");
 			}
 		});
 		Message msg = new MimeMessage(s);
@@ -194,16 +201,15 @@ public class DownloadFileBySCP {
 			String sql = "INSERT INTO data_file_logs ( your_filename, status_file,encode,delimiter,number_column,download_to_dir_local,time_staging,staging_load_count,table_staging_load) VALUES (?,?,?,?,?,?,?,?,?)";
 			PreparedStatement statement = connectControlDB.prepareStatement(sql);
 
-
 			statement.setString(1, file.getName());
 			statement.setString(2, "OK download");
 			statement.setString(3, "UTF-8");
-			statement.setString(4, ""); // delimiter
+			statement.setString(4, ";"); // delimiter
 			statement.setString(5, "");// column
 			statement.setString(6, folderToDown);
 			statement.setString(7, "");// time staging
 			statement.setString(8, "");// staging count
-			statement.setString(9, "");// table staging
+			statement.setString(9, config.getStagingload());// table staging
 			// System.out.println(Long.toString(file.length()));
 
 			statement.executeUpdate();
@@ -216,7 +222,7 @@ public class DownloadFileBySCP {
 			scpObject.sendMail("Write Log Fail");
 			System.out.println(e);
 		}
-		
+
 	}
 
 	public void transTemporaryFolder(String pathOfStagingFolder) throws AddressException, MessagingException {
@@ -281,8 +287,50 @@ public class DownloadFileBySCP {
 //
 		for (File files : children) {
 			scpObject.writeLog(files);
+
 		}
 	}
+
+// update log
+	
+//	public void updateLog() {
+//		Connection conn = null;
+//		PreparedStatement pre_control = null;
+//		try {
+//			// 1. Káº¿t ná»‘i tá»›i Control_DB
+//			conn = new GetConnection().getConnection("wh_update?serverTimezone=UTC");
+//			pre_control = conn.prepareStatement("Select your_filename from data_file_logs  ");
+//			ResultSet re = pre_control.executeQuery();
+//			String filename = null;
+//			String a =null;
+//			
+//
+//			while (re.next()) {
+//				filename = re.getString("your_filename");
+//				filename.substring(0,filename.length()-4);
+//				a= filename.concat(".csv");
+//				
+//				String sql2 = "UPDATE data_file_logs SET your_filename='"+a+"'";
+//						
+//
+//				pre_control = conn.prepareStatement(sql2);
+//				pre_control.executeUpdate();
+//
+//				System.out.println("__________success update_____________");
+//				
+//			}
+//			// dong nguon control
+//			re.close();
+//			pre_control.close();
+//			conn.close();
+//			
+//		} catch (Exception e) {
+//		
+//			System.out.println("__________loiôiiôiiôi update_____________");
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 // lấy đuôi file
 	public String findEx(String path) {
@@ -297,18 +345,16 @@ public class DownloadFileBySCP {
 		scpObject.connectToConfig(idconfig);
 		scpObject.download();
 		scpObject.transTemporaryFolder(folderToDown);
-		scpObject.rename();
+		//scpObject.rename();
 		scpObject.writeLogFollder();
+		stagig.updateBulk();
 	}
 
 	public static void main(String[] args) throws AddressException, MessagingException {
-
-		// download("drive.ecepvn.org", 2227, "guest_access", "123456",
-		// "/volume1/ECEP/song.nguyen/DW_2020/data",
-		// "T:\\A_TheDuck_viet\\Eclipse\\fileDownload");
-		DownloadFileBySCP scp = new DownloadFileBySCP();
-		scp.mainSCP("1");
-//	
-
+		DownloadFileBySCP d = new DownloadFileBySCP();
+		
+		 d.mainSCP(args[0]);
+		//d.mainSCP("2");
 	}
+
 }

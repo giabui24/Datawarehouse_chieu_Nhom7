@@ -9,7 +9,10 @@ public class Config {
 	private String user;
 	private String password;
 	private String remotepath;
-	public Config(String idconfig, String hostname, String port, String user, String password, String remotepath) {
+	private String namesub;
+	private String stagingload;
+	public Config(String idconfig, String hostname, String port, String user, String password, String remotepath,
+			String namesub, String stagingload) {
 		super();
 		this.idconfig = idconfig;
 		this.hostname = hostname;
@@ -17,6 +20,8 @@ public class Config {
 		this.user = user;
 		this.password = password;
 		this.remotepath = remotepath;
+		this.namesub = namesub;
+		this.stagingload = stagingload;
 	}
 	public String getIdconfig() {
 		return idconfig;
@@ -54,6 +59,18 @@ public class Config {
 	public void setRemotepath(String remotepath) {
 		this.remotepath = remotepath;
 	}
+	public String getNamesub() {
+		return namesub;
+	}
+	public void setNamesub(String namesub) {
+		this.namesub = namesub;
+	}
+	public String getStagingload() {
+		return stagingload;
+	}
+	public void setStagingload(String stagingload) {
+		this.stagingload = stagingload;
+	}
 	
-	
+
 }
