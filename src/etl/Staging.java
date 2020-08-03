@@ -48,7 +48,7 @@ public class Staging {
 				int number_column = re.getInt("number_column");// so cot
 
 				// 5. Kiểm tra file có tồn tại trên folder local "Data_Warehouse" chưa
-				String path = "E:\\" + dir + "\\" + filename;
+				String path =   dir + "\\" + filename;
 				System.out.println(path);
 				File file = new File(path);// mo file
 				if (!file.exists()) {
@@ -71,20 +71,28 @@ public class Staging {
 //							+ filename + "'\r\n" + "WITH\r\n" + "(" + "FIRSTROW = 2,\r\n" + "FIELDTERMINATOR = '"
 //							+ delimiter + "',\r\n" + "ROWTERMINATOR = '\\n'" + ")";
 
-					 String sql = "LOAD DATA INFILE '" + "E:\\" + dir + "\\" + filename + "' \r\n"
+	
+					 String sql = "LOAD DATA INFILE '" + dir + "\\" + filename + "' \r\n"
 					 + "INTO TABLE "
 					 + table_staging + "\r\n" + "FIELDS TERMINATED BY '" + delimiter + "' \r\n"
 					 + "ENCLOSED BY '\"'\r\n" + "LINES TERMINATED BY '\\n'\r\n" + "IGNORE 1 ROWS";
-					PreparedStatement pre_StagingAdd = conn_Staging.prepareStatement(sql);
-					count = pre_StagingAdd.executeUpdate();
-
-					// pre_StagingAdd.close();
-					// conn_Staging.close();
+					
+					 try {
+					 PreparedStatement pre_StagingAdd = conn_Staging.prepareStatement(sql);
+					 count = pre_StagingAdd.executeUpdate();
+					 System.out.println("Thanh Cong:\t" + "file name: " + filename + " ==> So dong thanh cong: " + count);
+					 
+					 
+					 } catch (Exception e) {
+						 System.out.println("Loi:\t" + "file name: " + filename   );
+						 System.out.println(e);
+					 }
+//					 pre_StagingAdd.close();
+//					 conn_Staging.close();
 					// 3. thuc hien update cac thong so lien quan
-					System.out
-							.println("Thanh Cong:\t" + "file name: " + filename + " ==> So dong thanh cong: " + count);
 					// 6.2.8. Kiểm tra sô dòng đọc được vào staging của file
 					if (count > 0) {
+						
 						String sql2 = "UPDATE data_file_logs SET staging_load_count=" + count + ", "
 								+ "status_file='OK Staging', data_file_logs.time_staging=now()  WHERE id=" + id;
 						pre_control = conn.prepareStatement(sql2);
@@ -116,9 +124,6 @@ public class Staging {
 
 	
 
-	// nhom 10 => file dinh dang ki cuc
-	// nhom2_ca2 => cat file bang cai gi k nhan dang duoc
-	// nhom6_ca2 : khong co file
 	public static void main(String[] args) {
 		 new Staging().updateBulk();
 //	new Staging().staging("data_file_logs.status_file like 'OK download'");
