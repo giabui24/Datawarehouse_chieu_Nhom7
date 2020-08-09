@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 import connection.GetConnection;
 import tool.SendMailTLS;
-//import warehouse.SendMail;
+
 //xu li data tu LOCAL vao STAGING
 public class Staging {
 	String emailSendTo, subject,textMail;
@@ -39,30 +39,29 @@ public class Staging {
 			int id;
 			String filename = null;
 
-			// 4. chạy từng record trong resultset
+			// 4. chạy từng record trong resultset cho từng file
 			while (re.next()) {
 
 				id = re.getInt("id");
-				String encode = re.getString("encode");
+				
 
-//				String valuesList = re.getString("insert_staging");// valuesList ? ?
-				String table_staging = re.getString("table_staging_load");// table cua nhom
+				String table_staging = re.getString("table_staging_load");// load vao tablestaging
 				String dir = re.getString("download_to_dir_local");
 				filename = re.getString("your_filename");
 
 				String delimiter = re.getString("delimiter");// dau phan cac cac phan tu
-				int number_column = re.getInt("number_column");// so cot
+				
 
 				// 5. Kiểm tra file có tồn tại trên folder local "Data_Warehouse" chưa
 				String path =   dir + "\\" + filename;
 				System.out.println(path);
 				File file = new File(path);// mo file
 				if (!file.exists()) {
-					// 6.1.1. Thông báo file không tồn tại ra màn hình
+					// 5.1.1. Thông báo file không tồn tại ra màn hình
 					System.out.println(path + "khong ton tai");
 					 textSendMail = path + "khong ton tai";
 						sendMail.sendMail("giabui21@gmail.com", "File bi bien mat ", textSendMail);
-					// 6.1.2. Cập nhật status_file là ERROR Staging, time_staging là ngày giờ hiện
+					// 5.1.2. Cập nhật status_file là ERROR Staging, time_staging là ngày giờ hiện
 					// tại
 					String sql2 = "UPDATE data_file_logs SET status_file='ERROR Staging', "
 							+ "data_file_logs.time_staging=now() WHERE id=" + id;
@@ -70,15 +69,20 @@ public class Staging {
 					pre_control.executeUpdate();
 				} else {
 					// neu file da ton tai
+					//5.2 ket noi vao databasestaging 
 					Connection conn_Staging = new GetConnection().getConnection("staging?serverTimezone=UTC");
 					int count = 0;// dem so dong doc duoc vao staging cua nhom
 					// 1 mo connection cua staging
 
-					// 2. thuc hien bulk vs table cua tung nhom
+					//5.3 thuc hien load data infile vs table cua tung nhom
 //					String sql = "bulk\r\n" + "INSERT " + table_staging + "\r\n" + "FROM '" + "D:\\" + dir + "\\"
 //							+ filename + "'\r\n" + "WITH\r\n" + "(" + "FIRSTROW = 2,\r\n" + "FIELDTERMINATOR = '"
 //							+ delimiter + "',\r\n" + "ROWTERMINATOR = '\\n'" + ")";
-
+					// table của db Staging
+					// IGNORE 1 ROWS: đọc từ dòng thứ 2(bỏ trường).
+					// LINES TERMINATED BY: delimiter của file.
+					// rowterminator: kết thúc hàng bằng xuống dòng /n
+				
 	
 					 String sql = "LOAD DATA INFILE '" + dir + "\\" + filename + "' \r\n"
 					 + "INTO TABLE "
@@ -86,6 +90,7 @@ public class Staging {
 					 + "ENCLOSED BY '\"'\r\n" + "LINES TERMINATED BY '\\n'\r\n" + "IGNORE 1 ROWS";
 					
 					 try {
+						 //5.4
 					 PreparedStatement pre_StagingAdd = conn_Staging.prepareStatement(sql);
 					 count = pre_StagingAdd.executeUpdate();
 					 System.out.println("Thanh Cong:\t" + "file name: " + filename + " ==> So dong thanh cong: " + count);
@@ -93,23 +98,25 @@ public class Staging {
 						sendMail.sendMail("giabui21@gmail.com", "Các file đã insert thành công vào db control", textSendMail);
 					 
 					 } catch (Exception e) {
+						 //5.3.1
 						 System.out.println("Loi:\t" + "file name: " + filename   );
 						 System.out.println(e);
-						 textSendMail = "Loi:\t" + "file name: " + filename +"\n"+  "loai loi"+e+"\n";
+						 textSendMail = "Loi:\t" + "file name: " + filename + "loai loi"+e;
 							sendMail.sendMail("giabui21@gmail.com", "Các file error", textSendMail);
 					 }
-//					 pre_StagingAdd.close();
+
 //					 conn_Staging.close();
 					// 3. thuc hien update cac thong so lien quan
-					// 6.2.8. Kiểm tra sô dòng đọc được vào staging của file
+					// 5.4. Kiểm tra sô dòng đọc được vào staging của file
 					if (count > 0) {
-						
+						//5.4.1
 						String sql2 = "UPDATE data_file_logs SET staging_load_count=" + count + ", "
 								+ "status_file='OK Staging', data_file_logs.time_staging=now()  WHERE id=" + id;
 						pre_control = conn.prepareStatement(sql2);
 						pre_control.executeUpdate();
 
 					} else {
+						//5.4.2
 						String sql2 = "UPDATE data_file_logs SET staging_load_count=" + count + ", "
 								+ "status_file='ERROR Staging', data_file_logs.time_staging=now() WHERE id=" + id;
 						pre_control = conn.prepareStatement(sql2);
