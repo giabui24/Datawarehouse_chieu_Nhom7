@@ -96,8 +96,31 @@ public class DownloadFileBySCP {
 
 	public void deleteFolder() {
 		File file = new File(tempfolder);
-		file.delete();
-		System.out.println("Folder used to download was deleted");
+//		file.delete();
+//		System.out.println("Folder used to download was deleted");
+		// neu file la thu muc thi xoa het thu muc con va file cua no
+		if (file.isDirectory()) {
+			// liet ke tat ca file
+			String[] files = file.list();
+			for (String child : files) {
+				File childDir = new File(file, child);
+				// neu childDir la file thi xoa
+				childDir.delete();
+				System.out.println("Files were deleted : " + childDir.getAbsolutePath());
+
+			}
+			// Check lai va xoa thu muc cha
+			if (file.list().length == 0) {
+				file.delete();
+				System.out.println(" Folder was deleted : " + file.getAbsolutePath());
+			}
+
+		} else {
+			// neu file la file thi xoa
+			file.delete();
+			System.out.println("File bi da bi xoa " + file.getAbsolutePath());
+		}
+
 	}
 
 	public static void download() {
