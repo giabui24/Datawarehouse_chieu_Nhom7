@@ -9,12 +9,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import connection.GetConnection;
-
+import tool.SendMailTLS;
+import warehouse.SendMail;
 //xu li data tu LOCAL vao STAGING
 public class Staging {
+	String emailSendTo, subject,textMail;
 	
 	
 	public void updateBulk() {
+		SendMailTLS sendMail = new SendMailTLS();
+		
+		
+		String textSendMail ="";
 		Connection conn = null;
 		PreparedStatement pre_control = null;
 		try {
@@ -54,6 +60,8 @@ public class Staging {
 				if (!file.exists()) {
 					// 6.1.1. Thông báo file không tồn tại ra màn hình
 					System.out.println(path + "khong ton tai");
+					 textSendMail = path + "khong ton tai";
+						sendMail.sendMail("giabui21@gmail.com", "File bi bien mat ", textSendMail);
 					// 6.1.2. Cập nhật status_file là ERROR Staging, time_staging là ngày giờ hiện
 					// tại
 					String sql2 = "UPDATE data_file_logs SET status_file='ERROR Staging', "
@@ -81,11 +89,14 @@ public class Staging {
 					 PreparedStatement pre_StagingAdd = conn_Staging.prepareStatement(sql);
 					 count = pre_StagingAdd.executeUpdate();
 					 System.out.println("Thanh Cong:\t" + "file name: " + filename + " ==> So dong thanh cong: " + count);
-					 
+					 textSendMail = "Thanh Cong:\t" + "file name: " + filename + " ==> So dong thanh cong: " + count;
+						sendMail.sendMail("giabui21@gmail.com", "Các file đã insert thành công vào db control", textSendMail);
 					 
 					 } catch (Exception e) {
 						 System.out.println("Loi:\t" + "file name: " + filename   );
 						 System.out.println(e);
+						 textSendMail = "Loi:\t" + "file name: " + filename + "loai loi"+e;
+							sendMail.sendMail("giabui21@gmail.com", "Các file error", textSendMail);
 					 }
 //					 pre_StagingAdd.close();
 //					 conn_Staging.close();
