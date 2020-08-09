@@ -17,7 +17,7 @@ public class GetConnection {
 	String databasebName = null;
 
 	public Connection getConnection(String location) {
-		String link = "F://Datawarehouse_chieu_nhom07//src//config//config.properties";
+		String link = "C:\\Users\\ASUS\\git\\Datawarehouse_chieu_Nhom7\\src\\config\\config.properties";
 		Connection result = null;
 		
 		if (location.equalsIgnoreCase("databasecontrol?serverTimezone=UTC")) {

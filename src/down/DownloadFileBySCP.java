@@ -1,14 +1,10 @@
 package down;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -29,7 +25,6 @@ import com.chilkatsoft.CkSsh;
 
 import config.Config;
 import connection.ConnectMysql;
-import connection.GetConnection;
 import etl.Staging;
 import log.Log;
 
@@ -154,9 +149,7 @@ public class DownloadFileBySCP {
 		// download directory chieu
 		scp.put_SyncMustMatch(namesub);
 		success = scp.SyncTreeDownload(remotepath, localPath, 2, false);
-		// downloand diretory sang
-//		scp.put_SyncMustMatch("sinhvien_sang*.*");
-//		success = scp.SyncTreeDownload(remotepath, localPath, 2, false);
+	
 		if (!success) {
 			System.out.println(ssh.lastErrorText());
 			return;
@@ -245,39 +238,8 @@ public class DownloadFileBySCP {
 
 	}
 
-	// đổi tên các file có đôi khác csv và txt
-	public void rename() throws AddressException, MessagingException {
-		File dir = new File(folderToDown);
 
-		File[] children = dir.listFiles();
-//
-		for (File files : children) {
-			if (!findEx(files.getAbsolutePath()).equals("csv") && !findEx(files.getAbsolutePath()).equals("txt")) {
-				if (files.renameTo(new File(renameFileCSV(files.getAbsolutePath())))) {
-					System.out.println(files.getAbsolutePath() + " rename succssful");
-				} else {
-					System.out.println(files.getAbsolutePath() + " Rename failed");
-				}
-				// scpObject.writeLog(files);
-			}
-		}
-	}
 
-	// đổi tên thành .csv
-	public static String renameFileCSV(String fileName) {
-		String[] arrImg = fileName.split("\\.");
-		String duoiFileImg = arrImg[arrImg.length - 1];
-		String nameFile = "";
-		for (int i = 0; i < (arrImg.length - 1); i++) {
-			if (i == 0) {
-				nameFile = arrImg[i];
-			} else {
-				nameFile += "-" + arrImg[i];
-			}
-		}
-		nameFile = nameFile + "." + "csv";
-		return nameFile;
-	}
 
 	// cập nhật vào log
 	public void writeLogFollder() throws AddressException, MessagingException {
@@ -291,61 +253,14 @@ public class DownloadFileBySCP {
 		}
 	}
 
-// update log
-	
-//	public void updateLog() {
-//		Connection conn = null;
-//		PreparedStatement pre_control = null;
-//		try {
-//			// 1. Káº¿t ná»‘i tá»›i Control_DB
-//			conn = new GetConnection().getConnection("wh_update?serverTimezone=UTC");
-//			pre_control = conn.prepareStatement("Select your_filename from data_file_logs  ");
-//			ResultSet re = pre_control.executeQuery();
-//			String filename = null;
-//			String a =null;
-//			
-//
-//			while (re.next()) {
-//				filename = re.getString("your_filename");
-//				filename.substring(0,filename.length()-4);
-//				a= filename.concat(".csv");
-//				
-//				String sql2 = "UPDATE data_file_logs SET your_filename='"+a+"'";
-//						
-//
-//				pre_control = conn.prepareStatement(sql2);
-//				pre_control.executeUpdate();
-//
-//				System.out.println("__________success update_____________");
-//				
-//			}
-//			// dong nguon control
-//			re.close();
-//			pre_control.close();
-//			conn.close();
-//			
-//		} catch (Exception e) {
-//		
-//			System.out.println("__________loiôiiôiiôi update_____________");
-//			e.printStackTrace();
-//		}
-//
-//	}
 
-// lấy đuôi file
-	public String findEx(String path) {
-		String ex = "";
-		int numex = -99;
-		numex = path.indexOf(".");
-		ex = path.substring(numex + 1);
-		return ex;
-	}
+
+
 
 	public void mainSCP(String idconfig) throws AddressException, MessagingException {
 		scpObject.connectToConfig(idconfig);
-		scpObject.download();
-		scpObject.transTemporaryFolder(folderToDown);
-		//scpObject.rename();
+//		scpObject.download();
+//		scpObject.transTemporaryFolder(folderToDown);
 		scpObject.writeLogFollder();
 		stagig.updateBulk();
 	}
@@ -354,7 +269,6 @@ public class DownloadFileBySCP {
 		DownloadFileBySCP d = new DownloadFileBySCP();
 		
 		 d.mainSCP(args[0]);
-		//d.mainSCP("2");
+	//	d.mainSCP("2");
 	}
-
 }

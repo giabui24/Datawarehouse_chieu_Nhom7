@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 import connection.GetConnection;
 import tool.SendMailTLS;
-import warehouse.SendMail;
+//import warehouse.SendMail;
 //xu li data tu LOCAL vao STAGING
 public class Staging {
 	String emailSendTo, subject,textMail;
@@ -95,7 +95,7 @@ public class Staging {
 					 } catch (Exception e) {
 						 System.out.println("Loi:\t" + "file name: " + filename   );
 						 System.out.println(e);
-						 textSendMail = "Loi:\t" + "file name: " + filename + "loai loi"+e;
+						 textSendMail = "Loi:\t" + "file name: " + filename +"\n"+  "loai loi"+e+"\n";
 							sendMail.sendMail("giabui21@gmail.com", "Các file error", textSendMail);
 					 }
 //					 pre_StagingAdd.close();
