@@ -3,16 +3,28 @@ package config;
 import java.sql.Date;
 
 public class Config {
-	private String idconfig;
-	private String hostname;
-	private String port;
-	private String user;
-	private String password;
-	private String remotepath;
-	private String namesub;
-	private String stagingload;
+	String idconfig;
+	String hostname;
+	String port;
+	String user;
+	String password;
+	String remotepath;
+	String namesub;
+	String stagingload;
+	String sVNameSta;
+	String dBNameSta;
+	String tBNameSta;
+	String userNameSta;
+	String passSta;
+	String sVNameWH;
+	String dBNameWH;
+	String tBNameWH;
+	String userNameWH;
+	String passWH;
 	public Config(String idconfig, String hostname, String port, String user, String password, String remotepath,
-			String namesub, String stagingload) {
+			String namesub, String stagingload, String sVNameSta, String dBNameSta, String tBNameSta,
+			String userNameSta, String passSta, String sVNameWH, String dBNameWH, String tBNameWH, String userNameWH,
+			String passWH) {
 		super();
 		this.idconfig = idconfig;
 		this.hostname = hostname;
@@ -22,6 +34,16 @@ public class Config {
 		this.remotepath = remotepath;
 		this.namesub = namesub;
 		this.stagingload = stagingload;
+		this.sVNameSta = sVNameSta;
+		this.dBNameSta = dBNameSta;
+		this.tBNameSta = tBNameSta;
+		this.userNameSta = userNameSta;
+		this.passSta = passSta;
+		this.sVNameWH = sVNameWH;
+		this.dBNameWH = dBNameWH;
+		this.tBNameWH = tBNameWH;
+		this.userNameWH = userNameWH;
+		this.passWH = passWH;
 	}
 	public String getIdconfig() {
 		return idconfig;
@@ -71,6 +93,65 @@ public class Config {
 	public void setStagingload(String stagingload) {
 		this.stagingload = stagingload;
 	}
-	
+	public String getsVNameSta() {
+		return sVNameSta;
+	}
+	public void setsVNameSta(String sVNameSta) {
+		this.sVNameSta = sVNameSta;
+	}
+	public String getdBNameSta() {
+		return dBNameSta;
+	}
+	public void setdBNameSta(String dBNameSta) {
+		this.dBNameSta = dBNameSta;
+	}
+	public String gettBNameSta() {
+		return tBNameSta;
+	}
+	public void settBNameSta(String tBNameSta) {
+		this.tBNameSta = tBNameSta;
+	}
+	public String getUserNameSta() {
+		return userNameSta;
+	}
+	public void setUserNameSta(String userNameSta) {
+		this.userNameSta = userNameSta;
+	}
+	public String getPassSta() {
+		return passSta;
+	}
+	public void setPassSta(String passSta) {
+		this.passSta = passSta;
+	}
+	public String getsVNameWH() {
+		return sVNameWH;
+	}
+	public void setsVNameWH(String sVNameWH) {
+		this.sVNameWH = sVNameWH;
+	}
+	public String getdBNameWH() {
+		return dBNameWH;
+	}
+	public void setdBNameWH(String dBNameWH) {
+		this.dBNameWH = dBNameWH;
+	}
+	public String gettBNameWH() {
+		return tBNameWH;
+	}
+	public void settBNameWH(String tBNameWH) {
+		this.tBNameWH = tBNameWH;
+	}
+	public String getUserNameWH() {
+		return userNameWH;
+	}
+	public void setUserNameWH(String userNameWH) {
+		this.userNameWH = userNameWH;
+	}
+	public String getPassWH() {
+		return passWH;
+	}
+	public void setPassWH(String passWH) {
+		this.passWH = passWH;
+	}
 
 }
