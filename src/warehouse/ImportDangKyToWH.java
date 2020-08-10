@@ -65,8 +65,6 @@ public class ImportDangKyToWH {
 					ms += "Lỗi: dữ liệu ngày đăng ký không đúng định dạng \n";
 				}
 				iDFile = dk.getIdFile();
-				int sk = 0;
-				Date_Dim dateDim=new Date_Dim();
 				// Kiểm tra xem trong warehouse có chứa đăng ký hay chưa
 				sql = "Select * from " + TBNameWH + " where maDK = '" + maDK + "' and dt_expired = '9999-12-31 00:00:00'";
 				warehouseRec = warehouse.executeQuery(sql);
@@ -90,7 +88,7 @@ public class ImportDangKyToWH {
 						try {
 							// Insert dữ liệu mới vào warehouse
 							sql = "Insert into " + TBNameWH + " (maDK, maSV, maLopHoc, thoiGianDK, idFile, dt_Expired, flag)"
-									+ "values('" + maDK + "','" + maSV + "','" + maLopHoc + "','" + String.valueOf(sk) + "','" + iDFile
+									+ "values('" + maDK + "','" + maSV + "','" + maLopHoc + "','" + String.valueOf(tgDk) + "','" + iDFile
 									+ "','9999-12-31 00:00:00','loading')";
 							warehouse.executeLargeUpdate(sql);
 						} catch (Exception e) {
@@ -101,7 +99,7 @@ public class ImportDangKyToWH {
 					try {
 						// Insert dữ liệu mới vào warehouse
 						sql = "Insert into " + TBNameWH + " (maDK, maSV, maLopHoc, thoiGianDK, idFile, dt_Expired, flag)"
-								+ "values('" + maDK + "','" + maSV + "','" + maLopHoc + "','" + String.valueOf(sk) + "','" + iDFile
+								+ "values('" + maDK + "','" + maSV + "','" + maLopHoc + "','" + String.valueOf(tgDk) + "','" + iDFile
 								+ "','9999-12-31 00:00:00','loading')";
 						warehouse.executeLargeUpdate(sql);
 					} catch (Exception e) {
@@ -111,7 +109,7 @@ public class ImportDangKyToWH {
 			}
 		}
 		if (ms.equals("")) {
-			ms += "File " + iDFile + " imported";
+			ms += "File đăng ký imported";
 			// Cập nhật trạng thái
 			sql = "Update " + TBNameWH + " set flag='finish' where flag ='loading' or flag='update'";
 			warehouse.executeLargeUpdate(sql);
@@ -119,7 +117,7 @@ public class ImportDangKyToWH {
 			sql = "Insert into Log(idFile, beginTime, finishTime, states) values('" + iDFile + "','" + date + " " + time
 					+ "',now(),'Finish')";
 		} else {
-			ms += "File " + iDFile + " Error";
+			ms += "File đăng ký Error";
 			// Xóa toàn bộ dữ liệu của file mới đưa vào trong phiên làm việc bị
 			// lỗi
 			sql = "DELETE FROM " + TBNameWH + " WHERE flag = 'loading'";
