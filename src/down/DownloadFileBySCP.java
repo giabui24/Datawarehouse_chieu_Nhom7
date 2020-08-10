@@ -4,8 +4,10 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -25,13 +27,18 @@ import com.chilkatsoft.CkSsh;
 
 import config.Config;
 import connection.ConnectMysql;
+import warehouse.ImportDangKyToWH;
+import warehouse.ImportLopHocToWH;
+import warehouse.ImportMonHocToWH;
+import warehouse.ImportSinhVienToWH;
+import warehouse.LoadConfig;
 import etl.Staging;
 import log.Log;
 
 public class DownloadFileBySCP {
 	public static Staging stagig = new Staging();
 	public static DownloadFileBySCP scpObject = new DownloadFileBySCP();
-	public Config config = new Config(null, null, null, null, null, null, null,null);
+	public Config config = new Config(null, null, null, null, null, null, null,null,null,null,null,null,null,null,null,null,null,null);
 	public Log log = new Log(null, null, null, null, null, null, null, null, null, null);
 	String text = "";
 	public String folderToDown = "Z:\\data_WH\\";
@@ -178,7 +185,6 @@ public class DownloadFileBySCP {
 			return;
 		}
 
-		// log.writeHistory(hostname, username, pass, fileName, status);
 		System.out.println("SCP download file success.");
 		ssh.Disconnect();
 
@@ -280,18 +286,34 @@ public class DownloadFileBySCP {
 
 
 
-	public void mainSCP(String idconfig) throws AddressException, MessagingException {
+	public void mainSCP(String idconfig) throws AddressException, MessagingException, SQLException, ClassNotFoundException {
 		scpObject.connectToConfig(idconfig);
 //		scpObject.download();
 //		scpObject.transTemporaryFolder(folderToDown);
 		scpObject.writeLogFollder();
 		stagig.updateBulk();
+//
+		ArrayList<warehouse.Config> list = new LoadConfig().loadConfig();
+		warehouse.Config config;
+	//	for (int i= 1; i<=list.size(); i++){
+		int id = Integer.parseInt(idconfig);
+			config = list.get(id);
+			String file = config.getNamesub();
+			if (file.substring(0, 8).equals("sinhvien"))
+				new ImportSinhVienToWH().importSV(id);
+			if (file.substring(0, 6).equals("Monhoc"))
+				new ImportMonHocToWH().importMH(id);
+			if (file.substring(0, 6).equals("Lophoc"))
+				new ImportLopHocToWH().importLH(id);
+			if (file.substring(0, 6).equals("Dangky"))
+				new ImportDangKyToWH().importDK(id);
+		
 	}
 
-	public static void main(String[] args) throws AddressException, MessagingException {
-		DownloadFileBySCP d = new DownloadFileBySCP();
-		
-		 d.mainSCP(args[0]);
+//	public static void main(String[] args) throws AddressException, MessagingException, ClassNotFoundException, SQLException {
+//		DownloadFileBySCP d = new DownloadFileBySCP();
+//		
+//		 d.mainSCP(args[0]);
 	//	d.mainSCP("2");
-	}
+//	}
 }

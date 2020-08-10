@@ -1,4 +1,5 @@
 package warehouse;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,9 +14,9 @@ public class LoadConfig {
 		ResultSet result = null;
 		String sql = "";
 		Class.forName("com.mysql.jdbc.Driver");
-		String url = "jdbc:mysql://localhost:3306/datawarehouse?useUnicode=true&amp;characterEncoding=utf8?autoReconnect=true&useSSL=false";
+		String url = "jdbc:mysql://localhost:3306/wh_update?useUnicode=true&amp;characterEncoding=utf8?autoReconnect=true&useSSL=false";
 		String user = "root";
-		String password = "0411";
+		String password = "root";
 		connection = DriverManager.getConnection(url, user, password);
 		sql = "Select * from Config";
 		result = connection.createStatement().executeQuery(sql);
@@ -37,6 +38,7 @@ public class LoadConfig {
 			String password = ReConfig.getString("password");
 			String remotepath = ReConfig.getString("remotepath");
 			String namesub = ReConfig.getString("namesub");
+			String stagingload = ReConfig.getString("stagingload");
 			String sVNameSta = ReConfig.getString("sVNameSta");
 			String dBNameSta = ReConfig.getString("dBNameSta");
 			String tBNameSta = ReConfig.getString("tBNameSta");
@@ -47,7 +49,7 @@ public class LoadConfig {
 			String tBNameWH = ReConfig.getString("tBNameWH");
 			String userNameWH = ReConfig.getString("userNameWH");
 			String passWH = ReConfig.getString("passWH");
-			config = new Config(idConfig, hostName, port, user, password, remotepath, namesub, sVNameSta, dBNameSta,
+			config = new Config(idConfig, hostName, port, user, password, remotepath, namesub,stagingload, sVNameSta, dBNameSta,
 					tBNameSta, userNameSta, passSta, sVNameWH, dBNameWH, tBNameWH, userNameWH, passWH);
 			listConfig.add(config);
 		}

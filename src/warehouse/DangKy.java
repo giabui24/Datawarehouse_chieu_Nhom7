@@ -1,5 +1,6 @@
 package warehouse;
 
+
 public class DangKy {
 	String maDK;
 	String maSV;

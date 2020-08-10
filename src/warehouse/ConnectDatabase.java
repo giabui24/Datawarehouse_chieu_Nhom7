@@ -1,4 +1,5 @@
 package warehouse;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -18,7 +19,7 @@ public class ConnectDatabase {
 		Class.forName("com.mysql.jdbc.Driver");
 		String url = "jdbc:mysql://localhost:3306/datawarehouse?useUnicode=true&amp;characterEncoding=utf8?autoReconnect=true&useSSL=false";
 		String user = "root";
-		String password = "0411";
+		String password = "root";
 		connection = DriverManager.getConnection(url, user, password);
 		return connection;
 	}

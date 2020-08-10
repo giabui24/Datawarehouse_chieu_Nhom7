@@ -5,7 +5,6 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 public class ImportSinhVienToWH {
 	public void importSV(int idConfig) throws SQLException {
@@ -17,8 +16,8 @@ public class ImportSinhVienToWH {
 		Statement warehouse = null;
 		String TBNameWH = null;
 		SinhVien sv = null;
-		Config config = new LoadConfig().getConfig(idConfig);
 		ArrayList<SinhVien> listSV = new LoadSinhVienFromStaging().getStagingSV(idConfig);
+		Config config = new LoadConfig().getConfig(idConfig);
 		// Lưu lại thời gian bắt đầu load dữ liệu
 		String date = LocalDate.now().toString();
 		String time = LocalTime.now().toString().substring(0, 8);
@@ -51,12 +50,15 @@ public class ImportSinhVienToWH {
 				String queQuan = sv.getQueQuan();
 				String idFile = sv.getIdFile();
 				try {
-					StringTokenizer ns = new StringTokenizer(ngaySinh,"/");
-					int d = Integer.valueOf(ns.nextToken());
-					int m = Integer.valueOf(ns.nextToken());
-					int y = Integer.valueOf(ns.nextToken());
+					int y = Integer.valueOf(ngaySinh.substring(6, 10));
+					int m = Integer.valueOf(ngaySinh.substring(3, 5));
+					int d = Integer.valueOf(ngaySinh.substring(0, 2));
+//					System.out.println(y);
+//					System.out.println(m);
+//					System.out.println(d);
 					// Lấy skDateDim trong bảng dataDim
 					sk = dateDim.getSKDateDim(String.valueOf(y) + "-" + String.valueOf(m) + "-" + String.valueOf(d));
+					
 					// Lấy thông tin sinh viên có maSV trong warehouse
 					sql = "Select * from " + TBNameWH + " where " + TBNameWH + ".maSV = " + maSV + " and " + TBNameWH
 							+ ".dt_Expired = '9999-12-31 00:00:00.000'";
@@ -134,8 +136,8 @@ public class ImportSinhVienToWH {
 		} else {
 			ms += "File " + IDFile + " Error";
 			//Xóa toàn bộ dữ liệu của file mới đưa vào trong phiên làm việc bị lỗi
-			sql="DELETE FROM "+ TBNameWH +" WHERE flag = 'loading'";
-			warehouse.executeLargeUpdate(sql);
+//			sql="DELETE FROM "+ TBNameWH +" WHERE flag = 'loading'";
+//			warehouse.executeLargeUpdate(sql);
 			//Cập nhật lại dt_Expired đã sửa đổi trong phiên làm việc bị lỗi
 			sql = "Update " + TBNameWH + " set dt_expired= '9999-12-31 00:00:00.000', flag='finish' where flag='update'";
 			warehouse.executeLargeUpdate(sql);

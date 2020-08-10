@@ -1,13 +1,14 @@
 package warehouse;
 
 public class Config {
-	String idConfig;
-	String hostName;
+	String idconfig;
+	String hostname;
 	String port;
 	String user;
 	String password;
 	String remotepath;
 	String namesub;
+	String stagingload;
 	String sVNameSta;
 	String dBNameSta;
 	String tBNameSta;
@@ -18,17 +19,19 @@ public class Config {
 	String tBNameWH;
 	String userNameWH;
 	String passWH;
-	public Config(String idConfig, String hostName, String port, String user, String password, String remotepath,
-			String namesub, String sVNameSta, String dBNameSta, String tBNameSta, String userNameSta, String passSta,
-			String sVNameWH, String dBNameWH, String tBNameWH, String userNameWH, String passWH) {
+	public Config(String idconfig, String hostname, String port, String user, String password, String remotepath,
+			String namesub, String stagingload, String sVNameSta, String dBNameSta, String tBNameSta,
+			String userNameSta, String passSta, String sVNameWH, String dBNameWH, String tBNameWH, String userNameWH,
+			String passWH) {
 		super();
-		this.idConfig = idConfig;
-		this.hostName = hostName;
+		this.idconfig = idconfig;
+		this.hostname = hostname;
 		this.port = port;
 		this.user = user;
 		this.password = password;
 		this.remotepath = remotepath;
 		this.namesub = namesub;
+		this.stagingload = stagingload;
 		this.sVNameSta = sVNameSta;
 		this.dBNameSta = dBNameSta;
 		this.tBNameSta = tBNameSta;
@@ -40,17 +43,17 @@ public class Config {
 		this.userNameWH = userNameWH;
 		this.passWH = passWH;
 	}
-	public String getIdConfig() {
-		return idConfig;
+	public String getIdconfig() {
+		return idconfig;
 	}
-	public void setIdConfig(String idConfig) {
-		this.idConfig = idConfig;
+	public void setIdconfig(String idconfig) {
+		this.idconfig = idconfig;
 	}
-	public String getHostName() {
-		return hostName;
+	public String getHostname() {
+		return hostname;
 	}
-	public void setHostName(String hostName) {
-		this.hostName = hostName;
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
 	}
 	public String getPort() {
 		return port;
@@ -81,6 +84,12 @@ public class Config {
 	}
 	public void setNamesub(String namesub) {
 		this.namesub = namesub;
+	}
+	public String getStagingload() {
+		return stagingload;
+	}
+	public void setStagingload(String stagingload) {
+		this.stagingload = stagingload;
 	}
 	public String getsVNameSta() {
 		return sVNameSta;
@@ -142,14 +151,5 @@ public class Config {
 	public void setPassWH(String passWH) {
 		this.passWH = passWH;
 	}
-	@Override
-	public String toString() {
-		return "Config [idConfig=" + idConfig + ", hostName=" + hostName + ", port=" + port + ", user=" + user
-				+ ", password=" + password + ", remotepath=" + remotepath + ", namesub=" + namesub + ", sVNameSta="
-				+ sVNameSta + ", dBNameSta=" + dBNameSta + ", tBNameSta=" + tBNameSta + ", userNameSta=" + userNameSta
-				+ ", passSta=" + passSta + ", sVNameWH=" + sVNameWH + ", dBNameWH=" + dBNameWH + ", tBNameWH="
-				+ tBNameWH + ", userNameWH=" + userNameWH + ", passWH=" + passWH + "]";
-	}
-	
-	
+
 }
