@@ -1,5 +1,4 @@
 package warehouse;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -34,6 +33,7 @@ public class ImportLopHocToWH {
 		if (config != null && warehouse != null && !listLH.isEmpty()) {
 			TBNameWH = config.gettBNameWH();
 			int index = 0;
+			Transform transform = new Transform();
 			while (index<listLH.size() && ms.equals("")) {
 				ResultSet warehouseRec = null;
 				lh = listLH.get(index);
@@ -42,6 +42,7 @@ public class ImportLopHocToWH {
 				String maMH = "";
 				try{
 					maMH= transform.transformMHDim(lh.getMaMH(), idConfig);
+					if (maMH==null) ms += "Lỗi: mã môn học " + lh.getMaMH() + " không tồn tại hoặc đã hết hạn\n";
 				}
 				catch (Exception e) {
 					ms += "Lỗi: transform maMH của môn học có mã " + lh.getMaMH() + "\n";
