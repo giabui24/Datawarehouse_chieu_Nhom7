@@ -46,12 +46,15 @@ public class ImportDangKyToWH {
 				int tgDk = 0;
 				try{
 				maSV = changeForm.transformSVDim(dk.getMaSV(),idConfig);
+				if (maSV==null) ms+= "Lỗi: Mã sinh viên " + dk.getMaSV() + " không tồn tại hoặc đã hết hạn\n";
 				}
 				catch (Exception e) {
 					ms += "Lỗi: transform maSV của sinh viên có mã " + dk.getMaSV() + "\n";
 				}
 				try{
-				maLopHoc = changeForm.transformMHDim(dk.getMaLopHoc(), idConfig);}
+				maLopHoc = changeForm.transformLHDim(dk.getMaLopHoc(), idConfig);
+				if (maLopHoc==null) ms+= "Lỗi: Mã lớp học " + dk.getMaLopHoc() + " không tồn tại hoặc đã hết hạn\n";
+				}
 				catch (Exception e) {
 					ms += "Lỗi: transform maLopHoc của lớp học có mã " + dk.getMaLopHoc() + "\n";
 				}
