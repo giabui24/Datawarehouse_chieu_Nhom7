@@ -1,6 +1,5 @@
 package warehouse;
 
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,6 +7,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.StringTokenizer;
 import java.util.Date;
 
 import org.joda.time.DateTime;
@@ -28,7 +28,7 @@ public class Date_Dim {
 			// TODO: handle exception
 		}
 		Statement sta = con.createStatement();
-		String sql = "Select * from datedim where datedim.full_date = '" + dateTime + "'";
+		String sql = "Select * from datedim where full_date = '" + dateTime + "'";
 		ResultSet re = sta.executeQuery(sql);
 		int sk = 0;
 		if (re.next()) {
@@ -37,8 +37,16 @@ public class Date_Dim {
 		con.close();
 		return sk;
 	}
+	public void insertDateDim(String dateTime) throws ClassNotFoundException, SQLException{
+		StringTokenizer ns = new StringTokenizer(dateTime,"/");
+		int y = Integer.valueOf(ns.nextToken());
+		int m = Integer.valueOf(ns.nextToken());
+		int d= Integer.valueOf(ns.nextToken());
+		DateTime dt=new DateTime(y,m,d,0,0,0);
+		importDateDim(dt, dt.plus(Period.days(1)));
+	}
 
-	public void importDateDim() throws ClassNotFoundException, SQLException {
+	public void importDateDim(DateTime startDateTime, DateTime endDateTime) throws ClassNotFoundException, SQLException {
 		ConnectDatabase conDB = new ConnectDatabase();
 		Connection con = conDB.connectDateDim();
 		int sk;
@@ -55,11 +63,9 @@ public class Date_Dim {
 		int week_of_year_monday = 0;
 		String year_week_monday = "";
 		String day_type = "";
-
-		DateTime startDateTime = new DateTime(1990, 1, 1, 0, 0, 0);
-		while (!startDateTime.equals(new DateTime(2001, 12, 31, 0, 0, 0))) {
+		while (!startDateTime.equals(endDateTime)) {
 			startDateTime = startDateTime.plus(Period.days(1));
-			Date startDate = startDateTime.toDate();
+			Date startDate = startDateTime.plus(Period.days(5)).toDate();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(startDate);
 
@@ -158,6 +164,8 @@ public class Date_Dim {
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		Date_Dim dim = new Date_Dim();
-		dim.importDateDim();
+		
+		dim.insertDateDim("1003/3/16");
+		System.out.println(dim.getSKDateDim("1003/3/16"));
 	}
 }
