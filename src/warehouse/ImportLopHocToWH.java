@@ -39,7 +39,13 @@ public class ImportLopHocToWH {
 				lh = listLH.get(index);
 				index++;
 				String maLopHoc = lh.getMaLopHoc();
-				String maMH = lh.getMaMH();
+				String maMH = "";
+				try{
+					maMH= transform.transformMHDim(lh.getMaMH(), idConfig);
+				}
+				catch (Exception e) {
+					ms += "Lỗi: transform maMH của môn học có mã " + lh.getMaMH() + "\n";
+				}
 				String namHoc = lh.getNamHoc();
 				iDFile = lh.getIdFile();
 				// Kiểm tra xem trong warehouse có chứa lớp học nào có maLopHoc hay chưa
