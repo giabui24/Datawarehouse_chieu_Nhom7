@@ -38,6 +38,16 @@ public class Transform {
 		return re.getString("id");
 	}
 	
+	public String transformLHDim(String maLH, int idConfig) throws ClassNotFoundException, SQLException{
+		ConnectDatabase conDB = new ConnectDatabase();
+		Connection con=conDB.connectWarehouseDB(idConfig);
+		String sql = "Select * from lophoc where maLopHoc='"+maLH+"' and dt_Expired='9999-12-31 00:00:00.000'";
+		ResultSet re = con.createStatement().executeQuery(sql);
+		re.next();
+		return re.getString("id");
+	}
+
+	
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
 		Transform changeForm=new Transform();
 		System.out.println(changeForm.transformSVDim("14153040", 1));
