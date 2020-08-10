@@ -1,5 +1,4 @@
 package warehouse;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,7 +7,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class ImportDangKyToWH {
-	public void importDK(int idConfig) throws SQLException, ClassNotFoundException {
+	public void importDK(int idConfig) throws SQLException {
 		ConnectDatabase conDB = new ConnectDatabase();
 		String ms = "";
 		String sql = "";
@@ -37,34 +36,42 @@ public class ImportDangKyToWH {
 			TBNameWH = config.gettBNameWH();
 			int index = 0;
 			while (index < listDK.size() && ms.equals("")) {
+				Transform changeForm = new Transform();
 				ResultSet warehouseRec = null;
 				dk = listDK.get(index);
 				index++;
 				String maDK = dk.getMaDK();
-				String maSV = dk.getMaSV();
-				String maLopHoc = dk.getMaLopHoc();
-				String tgDk = dk.getThoiGianDK();
+				String maSV = "";
+				String maLopHoc = "";
+				int tgDk = 0;
+				try{
+				maSV = changeForm.transformSVDim(dk.getMaSV(),idConfig);
+				}
+				catch (Exception e) {
+					ms += "Lỗi: transform maSV của sinh viên có mã " + dk.getMaSV() + "\n";
+				}
+				try{
+				maLopHoc = changeForm.transformMHDim(dk.getMaLopHoc(), idConfig);}
+				catch (Exception e) {
+					ms += "Lỗi: transform maLopHoc của lớp học có mã " + dk.getMaLopHoc() + "\n";
+				}
+				try{
+				tgDk = changeForm.transformDayDim(dk.getThoiGianDK());
+				}
+				catch (Exception e) {
+					ms += "Lỗi: dữ liệu ngày đăng ký không đúng định dạng \n";
+				}
 				iDFile = dk.getIdFile();
 				int sk = 0;
 				Date_Dim dateDim=new Date_Dim();
 				// Kiểm tra xem trong warehouse có chứa đăng ký hay chưa
 				sql = "Select * from " + TBNameWH + " where maDK = '" + maDK + "' and dt_expired = '9999-12-31 00:00:00'";
-				try {
-					int y = Integer.valueOf(tgDk.substring(6, 10));
-					int m = Integer.valueOf(tgDk.substring(3, 5));
-					int d = Integer.valueOf(tgDk.substring(0, 2));
-					// Lấy skDateDim trong bảng dataDim
-					sk = dateDim.getSKDateDim(String.valueOf(y) + "-" + String.valueOf(m) + "-" + String.valueOf(d));
-					warehouseRec = warehouse.executeQuery(sql);
-
-				} catch (Exception e) {
-					ms += e.getMessage() + " \n";
-				}
+				warehouseRec = warehouse.executeQuery(sql);
 				// Kiểm tra xem môn học có tồn tại trong warehouse hay không
 				if (warehouseRec.next()) {
 					// Đã tồn tại, kiểm tra các field còn lại xem khác biệt hay
 					// không
-					if (!warehouseRec.getString(5).equals(tgDk)) {
+					if (Integer.valueOf(warehouseRec.getString(5))!=tgDk) {
 						try {
 							// Set dt_expired của dữ liệu cũ thành thời gian
 							// hiện tại
