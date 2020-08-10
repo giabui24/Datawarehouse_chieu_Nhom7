@@ -1,3 +1,4 @@
+package warehouse;
 
 public class LopHoc {
 	String maLopHoc;

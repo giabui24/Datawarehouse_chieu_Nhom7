@@ -1,9 +1,11 @@
+package warehouse;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class ImportSinhVienToWH {
 	public void importSV(int idConfig) throws SQLException {
@@ -15,8 +17,8 @@ public class ImportSinhVienToWH {
 		Statement warehouse = null;
 		String TBNameWH = null;
 		SinhVien sv = null;
-		ArrayList<SinhVien> listSV = new LoadSinhVienFromStaging().getStagingSV(idConfig);
 		Config config = new LoadConfig().getConfig(idConfig);
+		ArrayList<SinhVien> listSV = new LoadSinhVienFromStaging().getStagingSV(idConfig);
 		// Lưu lại thời gian bắt đầu load dữ liệu
 		String date = LocalDate.now().toString();
 		String time = LocalTime.now().toString().substring(0, 8);
@@ -49,9 +51,10 @@ public class ImportSinhVienToWH {
 				String queQuan = sv.getQueQuan();
 				String idFile = sv.getIdFile();
 				try {
-					int y = Integer.valueOf(ngaySinh.substring(6, 10));
-					int m = Integer.valueOf(ngaySinh.substring(3, 5));
-					int d = Integer.valueOf(ngaySinh.substring(0, 2));
+					StringTokenizer ns = new StringTokenizer(ngaySinh,"/");
+					int d = Integer.valueOf(ns.nextToken());
+					int m = Integer.valueOf(ns.nextToken());
+					int y = Integer.valueOf(ns.nextToken());
 					// Lấy skDateDim trong bảng dataDim
 					sk = dateDim.getSKDateDim(String.valueOf(y) + "-" + String.valueOf(m) + "-" + String.valueOf(d));
 					// Lấy thông tin sinh viên có maSV trong warehouse

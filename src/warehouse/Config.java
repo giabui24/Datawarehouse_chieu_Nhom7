@@ -1,3 +1,4 @@
+package warehouse;
 
 public class Config {
 	String idConfig;

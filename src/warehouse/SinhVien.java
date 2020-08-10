@@ -1,3 +1,4 @@
+package warehouse;
 
 public class SinhVien {
 	String maSV;
